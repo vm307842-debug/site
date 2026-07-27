@@ -1,0 +1,14 @@
+
+(()=>{const menu=document.querySelector('[data-menu-toggle]'),nav=document.querySelector('[data-mobile-nav]');
+if(menu&&nav)menu.addEventListener('click',()=>nav.classList.toggle('open'));
+const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.08});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+const toast=document.querySelector('[data-toast]');function show(m){if(!toast)return;toast.textContent=m;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),3000)}
+const rf=document.querySelector('[data-route-search]'),rr=document.querySelector('[data-route-result]');
+const routes={'63':['Маршрут №63','ж/д Вокзал → городской маршрут. Фактическое положение автобуса смотрите в Go2bus.'],'вокзал':['Остановка «ж/д Вокзал»','В демо-справочнике найден маршрут №63. Рабочая версия должна получать данные из базы расписаний.'],'15':['Маршрут №15','Демонстрационный результат поиска.'],'горького':['Остановка «Горького»','Проверьте фактическое движение в сервисе Go2bus.']};
+if(rf&&rr)rf.addEventListener('submit',e=>{e.preventDefault();const v=new FormData(rf).get('route').trim().toLowerCase();const k=Object.keys(routes).find(x=>v.includes(x));const r=routes[k]||[`Поиск: ${v}`,'В прототипе такого маршрута нет. В рабочем сайте данные загружаются из транспортной системы.'];rr.innerHTML=`<strong>${r[0]}</strong><span>${r[1]}</span>`;rr.hidden=false});
+const af=document.querySelector('[data-appeal-form]');
+if(af)af.addEventListener('submit',e=>{e.preventDefault();const data=Object.fromEntries(new FormData(af).entries()),id=`EO-${new Date().getFullYear()}-${Math.floor(10000+Math.random()*90000)}`;const arr=JSON.parse(localStorage.getItem('eoyus_appeals')||'[]');arr.push({id,data,status:'Зарегистрировано',createdAt:new Date().toISOString()});localStorage.setItem('eoyus_appeals',JSON.stringify(arr));af.reset();show(`Обращение ${id} сохранено`);setTimeout(()=>alert(`Номер обращения: ${id}\n\nСохраните его. Это демонстрация, данные остались только в браузере.`),200)});
+const sf=document.querySelector('[data-status-form]'),sr=document.querySelector('[data-status-result]');
+if(sf&&sr)sf.addEventListener('submit',e=>{e.preventDefault();const id=new FormData(sf).get('ticket').trim().toUpperCase(),arr=JSON.parse(localStorage.getItem('eoyus_appeals')||'[]'),f=arr.find(x=>x.id===id);if(f){sr.className='status-result success';sr.innerHTML=`<b>${f.id}</b><br>Статус: ${f.status}<br><small>${new Date(f.createdAt).toLocaleString('ru-RU')}</small>`}else{sr.className='status-result error';sr.textContent='Обращение не найдено в этом браузере. Настоящей серверной базы в прототипе нет.'}});
+document.querySelectorAll('a[href="#"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();show('Раздел пока показан как интерфейсный прототип')}));})();
